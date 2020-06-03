@@ -1,0 +1,82 @@
+openapi: "3.0.3"
+info:
+  description: "API facade for the Here API"
+  version: "1.0.0"
+  title: "API facade"
+servers:
+- url: http://localhost:8080/api/v1
+  description: Development server
+
+paths:
+  /stations:
+      get:
+        tags:
+          - Stations       
+        summary: "Get list of train stations and the local weather at those stations"      
+        description: "Get list of train stations and the local weather at those stations"
+        security:
+          - ApiKeyAuth: []        
+        parameters:
+        - name: "in"
+          in: "query"
+          description: "{lat},{lng}"
+          required: true
+          schema:
+            type: "string"
+        - name: "r"
+          in: "query"
+          description: "radius"
+          required: false
+          schema:
+            type: "integer"
+        
+        responses:
+          "200":
+            description: "successful operation"
+            content:
+              application/json:
+                schema:
+                  type: array
+                  items:
+                    $ref: '#/components/schemas/Station'
+          "400":
+            description: "validation error operation"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error'
+          "500":
+            description: "server error operation"
+            content:
+              application/json:
+                schema:
+                  $ref: '#/components/schemas/Error' 
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      in: header
+      name: X-API-Key
+  schemas:
+    Station:
+      type: "object"
+      properties:
+        name:
+          type: "string"
+        weatherTemperature:
+          type: "string"
+        weatherIconLink:
+          type: "string"
+        proximity:
+          type: "number"
+          format: "double"
+    Error:
+      type: "object"
+      properties:
+        code:
+          type: "integer"
+          format: "int32"
+        type:
+          type: "string"
+        message:
+          type: "string"
